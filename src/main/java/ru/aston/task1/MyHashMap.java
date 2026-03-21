@@ -3,21 +3,22 @@ package ru.aston.task1;
 /**
  * Кастомная реализация HashMap для интенсива Aston.
  * Реализованы методы: put, get, remove, size, isEmpty, containsKey + dynamic resize.
+ * * @param <K> тип ключей
+ * * @param <V> тип значений
  *
  * @author Andrei Hromau
  * @version 1.0
  */
-public class MyHashMap<K, V> {
+public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] table;
     private int size = 0;
+    private static final int INITIAL_CAPACITY = 16;
 
     private static class Node<K, V> {
-        //поля
         K key;
         V value;
         Node<K, V> next;
 
-        //конструктор
         Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
@@ -26,10 +27,9 @@ public class MyHashMap<K, V> {
     }
 
     public MyHashMap() {
-        table = new Node[16];
+        table = new Node[INITIAL_CAPACITY];
     }
 
-    // определяем, в какой bucket попадет ключ
     private int getIndex(K key) {
         if (key == null) {
             return 0;
@@ -41,7 +41,6 @@ public class MyHashMap<K, V> {
         return hash % table.length;
     }
 
-    // 1.метод положить в корзину + ресайз, который вызовем отдельно
     public void put(K key, V value) {
         if (size >= table.length) {
             increaseCapacity();
@@ -59,8 +58,6 @@ public class MyHashMap<K, V> {
         size++;
     }
 
-    /* Исполнение ресайза в отдельный метод, чтобы не объединять описание логики
-       put + ресайз (согласно CLEAN CODE), а лишь вызов метода increaseCapacity() */
     private void increaseCapacity() {
         Node<K, V>[] oldTable = table;
         table = new Node[oldTable.length * 2];
@@ -75,7 +72,6 @@ public class MyHashMap<K, V> {
         }
     }
 
-    // 2.Метод получение значения по ключу
     public V get(K key) {
         int index = getIndex(key);
         Node<K, V> current = table[index];
@@ -88,7 +84,6 @@ public class MyHashMap<K, V> {
         return null;
     }
 
-    // 3.Метод удаления ключа
     public void remove(K key) {
         int index = getIndex(key);
         Node<K, V> current = table[index];
@@ -109,17 +104,14 @@ public class MyHashMap<K, V> {
         }
     }
 
-    // 4.Метод получение фактического размера
     public int size() {
         return size;
     }
 
-    // 5.Метод проверки на пустоту
     public boolean isEmpty() {
         return size == 0;
     }
 
-    // 6.Метод, проверяющий наличие ключа
     public boolean containsKey(K key) {
         return get(key) != null;
     }
