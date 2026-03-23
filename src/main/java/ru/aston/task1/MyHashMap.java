@@ -1,14 +1,5 @@
 package ru.aston.task1;
 
-/**
- * Кастомная реализация HashMap для интенсива Aston.
- * Реализованы методы: put, get, remove, size, isEmpty, containsKey + dynamic resize.
- * * @param <K> тип ключей
- * * @param <V> тип значений
- *
- * @author Andrei Hromau
- * @version 1.0
- */
 public class MyHashMap<K, V> implements MyMap<K, V> {
     private Node<K, V>[] table;
     private int size = 0;
