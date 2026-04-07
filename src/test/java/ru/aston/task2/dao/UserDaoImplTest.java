@@ -2,6 +2,7 @@ package ru.aston.task2.dao;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -40,6 +41,7 @@ class UserDaoImplTest extends DataBaseTestContainer {
 
     @Test
     @Order(1)
+    @DisplayName("Сохранение пользователя в БД")
     void testSave() {
         UserEntity user = createTestUser("test@example.com", "Test User", 25);
 
@@ -51,6 +53,7 @@ class UserDaoImplTest extends DataBaseTestContainer {
 
     @Test
     @Order(2)
+    @DisplayName("Поиск существующего пользователя по ID")
     void testFindByIdWhenExists() {
         UserEntity user = createTestUser("test@example.com", "Test User", 25);
         userDao.save(user);
@@ -65,6 +68,7 @@ class UserDaoImplTest extends DataBaseTestContainer {
 
     @Test
     @Order(3)
+    @DisplayName("Обновление пользователя")
     void testUpdate() {
         UserEntity user = createTestUser("vasya@mail.ru", "Вася", 20);
         userDao.save(user);
@@ -84,6 +88,7 @@ class UserDaoImplTest extends DataBaseTestContainer {
 
     @Test
     @Order(4)
+    @DisplayName("Получение всех пользователей")
     void testFindAll() {
         for (int i = 1; i <= 5; i++) {
             UserEntity user = createTestUser(String.format("test%d@mail.ru", i), String.format("Test %d", i), 20 + i);
@@ -96,6 +101,7 @@ class UserDaoImplTest extends DataBaseTestContainer {
 
     @Test
     @Order(5)
+    @DisplayName("Удаление пользователя")
     void testDeleteByIdWhenExists() {
         UserEntity user = createTestUser("masha@mail.ru", "Маша", 32);
         userDao.save(user);
