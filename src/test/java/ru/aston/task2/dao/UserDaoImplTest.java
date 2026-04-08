@@ -12,7 +12,6 @@ import ru.aston.task2.model.UserEntity;
 import ru.aston.task2.util.HibernateUtil;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -45,9 +44,7 @@ class UserDaoImplTest extends DataBaseTestContainer {
     void testSave() {
         UserEntity user = createTestUser("test@example.com", "Test User", 25);
 
-        boolean result = userDao.save(user);
-
-        assertTrue(result);
+        assertTrue(userDao.save(user));
         assertNotNull(user.getId());
     }
 
@@ -81,9 +78,7 @@ class UserDaoImplTest extends DataBaseTestContainer {
         vas.setName("Василий");
         assertTrue(userDao.update(vas));
 
-        Optional<UserEntity> updated = userDao.findById(vas.getId());
-        assertTrue(updated.isPresent());
-        assertEquals("Василий", updated.get().getName());
+        assertEquals("Василий", userDao.findById(vas.getId()).get().getName());
     }
 
     @Test
@@ -95,8 +90,7 @@ class UserDaoImplTest extends DataBaseTestContainer {
             userDao.save(user);
         }
 
-        List<UserEntity> users = userDao.findAll();
-        assertFalse(users.isEmpty());
+        assertFalse(userDao.findAll().isEmpty());
     }
 
     @Test
