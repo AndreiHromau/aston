@@ -8,7 +8,8 @@ public class HibernateUtil {
 
     private static SessionFactory build() {
         try {
-            return new Configuration().configure().buildSessionFactory();
+            String configFile = System.getProperty("test.config.file", "hibernate.cfg.xml");
+            return new Configuration().configure(configFile).buildSessionFactory();
         } catch (Exception e) {
             throw new ExceptionInInitializerError("Критическая ошибка инициализации БД: " + e.getMessage());
         }
