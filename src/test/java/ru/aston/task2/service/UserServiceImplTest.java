@@ -2,9 +2,10 @@ package ru.aston.task2.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import ru.aston.task2.dao.UserDao;
 import ru.aston.task2.model.UserEntity;
 
@@ -17,17 +18,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
-
     @Mock
     private UserDao userDaoMock;
+
     @InjectMocks
     private UserServiceImpl userService;
     private UserEntity testUser;
 
     @BeforeEach
     void setup() {
-        MockitoAnnotations.openMocks(this);
 
         testUser = new UserEntity();
         testUser.setId(1L);
