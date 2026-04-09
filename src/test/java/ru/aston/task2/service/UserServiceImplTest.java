@@ -29,7 +29,6 @@ class UserServiceImplTest {
 
     @BeforeEach
     void setup() {
-
         testUser = new UserEntity();
         testUser.setId(1L);
         testUser.setName("Тест");
