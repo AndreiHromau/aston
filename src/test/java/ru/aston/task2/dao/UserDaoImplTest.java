@@ -85,10 +85,7 @@ class UserDaoImplTest extends DataBaseTestContainer {
     @Order(4)
     @DisplayName("Получение всех пользователей")
     void testFindAll() {
-        for (int i = 1; i <= 5; i++) {
-            UserEntity user = createTestUser(String.format("test%d@mail.ru", i), String.format("Test %d", i), 20 + i);
-            userDao.save(user);
-        }
+        createTestUsers(5);
 
         assertFalse(userDao.findAll().isEmpty());
     }
@@ -103,6 +100,13 @@ class UserDaoImplTest extends DataBaseTestContainer {
 
         assertTrue(userDao.deleteById(id));
         assertFalse(userDao.findById(id).isPresent());
+    }
+
+    private void createTestUsers(int count) {
+        for (int i = 1; i <= count; i++) {
+            UserEntity user = createTestUser(String.format("test%d@mail.ru", i), String.format("Test %d", i), 20 + i);
+            userDao.save(user);
+        }
     }
 
     private UserEntity createTestUser(String email, String name, int age) {
