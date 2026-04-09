@@ -12,7 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -37,7 +36,7 @@ class UserServiceImplTest {
     void testCreateUser_ShouldCallDaoCreate() {
         userService.createUser(testUser);
 
-        verify(userDaoMock, times(1)).save(testUser);
+        verify(userDaoMock).save(testUser);
     }
 
     @Test
@@ -64,7 +63,7 @@ class UserServiceImplTest {
         testUser.setName("Вася");
         userService.updateUser(testUser);
 
-        verify(userDaoMock, times(1)).update(testUser);
+        verify(userDaoMock).update(testUser);
     }
 
     @Test
@@ -73,6 +72,6 @@ class UserServiceImplTest {
         boolean result = userService.deleteUser(1L);
 
         assertTrue(result);
-        verify(userDaoMock, times(1)).deleteById(1L);
+        verify(userDaoMock).deleteById(1L);
     }
 }
