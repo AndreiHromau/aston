@@ -1,15 +1,15 @@
 package ru.aston.task2.dao;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import ru.aston.task2.containers.DataBaseTestContainer;
 import ru.aston.task2.model.UserEntity;
-import ru.aston.task2.util.HibernateUtil;
+import ru.aston.task2.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -20,23 +20,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@SpringBootTest
 class UserDaoImplTest extends DataBaseTestContainer {
 
-    private UserDao userDao;
-
-    @BeforeEach
-    void setUp() {
-        userDao = new UserDaoImpl();
-    }
-
-    @AfterEach
-    void tearDown() {
-        try (var session = HibernateUtil.getSessionFactory().openSession()) {
-            var transaction = session.beginTransaction();
-            session.createMutationQuery("DELETE FROM UserEntity").executeUpdate();
-            transaction.commit();
-        }
-    }
+    @Autowired
+    private UserRepository userRepository;
 
     @Test
     @Order(1)
@@ -44,7 +32,7 @@ class UserDaoImplTest extends DataBaseTestContainer {
     void testSave() {
         UserEntity user = createTestUser("test@example.com", "Test User", 25);
 
-        assertTrue(userDao.save(user));
+        userRepository.save(user);
         assertNotNull(user.getId());
     }
 
@@ -53,9 +41,9 @@ class UserDaoImplTest extends DataBaseTestContainer {
     @DisplayName("Поиск существующего пользователя по ID")
     void testFindByIdWhenExists() {
         UserEntity user = createTestUser("test@example.com", "Test User", 25);
-        userDao.save(user);
+        userRepository.save(user);
 
-        Optional<UserEntity> found = userDao.findById(user.getId());
+        Optional<UserEntity> found = userRepository.findById(user.getId());
 
         assertTrue(found.isPresent());
         assertEquals(user.getEmail(), found.get().getEmail());
@@ -68,17 +56,17 @@ class UserDaoImplTest extends DataBaseTestContainer {
     @DisplayName("Обновление пользователя")
     void testUpdate() {
         UserEntity user = createTestUser("vasya@mail.ru", "Вася", 20);
-        userDao.save(user);
+        userRepository.save(user);
 
-        Optional<UserEntity> found = userDao.findById(user.getId());
+        Optional<UserEntity> found = userRepository.findById(user.getId());
         assertTrue(found.isPresent());
         assertEquals("Вася", found.get().getName());
 
         UserEntity vas = found.get();
         vas.setName("Василий");
-        assertTrue(userDao.update(vas));
+        userRepository.save(vas);
 
-        assertEquals("Василий", userDao.findById(vas.getId()).get().getName());
+        assertEquals("Василий", userRepository.findById(vas.getId()).get().getName());
     }
 
     @Test
@@ -87,7 +75,7 @@ class UserDaoImplTest extends DataBaseTestContainer {
     void testFindAll() {
         createTestUsers(5);
 
-        assertFalse(userDao.findAll().isEmpty());
+        assertFalse(userRepository.findAll().isEmpty());
     }
 
     @Test
@@ -95,17 +83,17 @@ class UserDaoImplTest extends DataBaseTestContainer {
     @DisplayName("Удаление пользователя")
     void testDeleteByIdWhenExists() {
         UserEntity user = createTestUser("masha@mail.ru", "Маша", 32);
-        userDao.save(user);
+        userRepository.save(user);
         long id = user.getId();
 
-        assertTrue(userDao.deleteById(id));
-        assertFalse(userDao.findById(id).isPresent());
+        userRepository.deleteById(id);
+        assertFalse(userRepository.findById(id).isPresent());
     }
 
     private void createTestUsers(int count) {
         for (int i = 1; i <= count; i++) {
             UserEntity user = createTestUser(String.format("test%d@mail.ru", i), String.format("Test %d", i), 20 + i);
-            userDao.save(user);
+            userRepository.save(user);
         }
     }
 

@@ -1,35 +1,39 @@
 package ru.aston.task2.service;
 
-import ru.aston.task2.dao.UserDao;
+import org.springframework.stereotype.Service;
 import ru.aston.task2.model.UserEntity;
+import ru.aston.task2.repository.UserRepository;
 
+@Service
 public class UserServiceImpl implements UserService {
 
-    private final UserDao userDao;
+    private final UserRepository userRepository;
 
-    public UserServiceImpl(UserDao userDao) {
-        this.userDao = userDao;
+    public UserServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override
     public UserEntity createUser(UserEntity user) {
-        userDao.save(user);
-        return user;
+        return userRepository.save(user);
     }
 
     @Override
     public UserEntity getUserById(Long id) {
-        return userDao.findById(id).orElse(null);
+        return userRepository.findById(id).orElse(null);
     }
 
     @Override
     public UserEntity updateUser(UserEntity user) {
-        userDao.update(user);
-        return user;
+        return userRepository.save(user);
     }
 
     @Override
     public boolean deleteUser(Long id) {
-        return userDao.deleteById(id);
+        if (!userRepository.existsById(id)) {
+            return false;
+        }
+        userRepository.deleteById(id);
+        return true;
     }
 }

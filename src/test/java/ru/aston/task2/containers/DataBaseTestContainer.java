@@ -22,10 +22,10 @@ public abstract class DataBaseTestContainer {
             postgresContainer.start();
         }
 
-        System.setProperty("hibernate.connection.url", postgresContainer.getJdbcUrl());
-        System.setProperty("hibernate.connection.username", postgresContainer.getUsername());
-        System.setProperty("hibernate.connection.password", postgresContainer.getPassword());
-        System.setProperty("hibernate.connection.driver_class", postgresContainer.getDriverClassName());
-        System.setProperty("test.config.file", "hibernate-test.cfg.xml");
+        System.setProperty("spring.datasource.url", postgresContainer.getJdbcUrl());
+        System.setProperty("spring.datasource.username", postgresContainer.getUsername());
+        System.setProperty("spring.datasource.password", postgresContainer.getPassword());
+        System.setProperty("spring.datasource.driver-class-name", postgresContainer.getDriverClassName());
+        System.setProperty("spring.jpa.hibernate.ddl-auto", "create-drop");
     }
 }

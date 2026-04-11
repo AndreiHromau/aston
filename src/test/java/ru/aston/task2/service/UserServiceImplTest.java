@@ -6,8 +6,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.aston.task2.dao.UserDao;
 import ru.aston.task2.model.UserEntity;
+import ru.aston.task2.repository.UserRepository;
 
 import java.util.Optional;
 
@@ -15,13 +15,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
     @Mock
-    private UserDao userDaoMock;
+    private UserRepository userRepositoryMock;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -37,44 +38,47 @@ class UserServiceImplTest {
 
     @Test
     void testCreateUser_ShouldCallDaoCreate() {
+        when(userRepositoryMock.save(testUser)).thenReturn(testUser);
         userService.createUser(testUser);
 
-        verify(userDaoMock).save(testUser);
+        verify(userRepositoryMock).save(testUser);
     }
 
     @Test
     void testGetUserById_UserExists_ShouldReturnUser() {
-        when(userDaoMock.findById(1L)).thenReturn(Optional.of(testUser));
+        when(userRepositoryMock.findById(1L)).thenReturn(Optional.of(testUser));
         UserEntity result = userService.getUserById(1L);
 
         assertNotNull(result);
         assertEquals("Тест", result.getName());
-        verify(userDaoMock).findById(1L);
+        verify(userRepositoryMock).findById(1L);
     }
 
     @Test
     void testGetUserById_UserDoesNotExist_ShouldReturnNull() {
-        when(userDaoMock.findById(999L)).thenReturn(Optional.empty());
+        when(userRepositoryMock.findById(999L)).thenReturn(Optional.empty());
         UserEntity result = userService.getUserById(999L);
 
         assertNull(result);
-        verify(userDaoMock).findById(999L);
+        verify(userRepositoryMock).findById(999L);
     }
 
     @Test
     void testUpdateUser_ShouldReturnUpdatedUser() {
         testUser.setName("Вася");
+        when(userRepositoryMock.save(any(UserEntity.class))).thenReturn(testUser);
         userService.updateUser(testUser);
 
-        verify(userDaoMock).update(testUser);
+        verify(userRepositoryMock).save(testUser);
     }
 
     @Test
     void testDeleteUser_ShouldReturnTrue() {
-        when(userDaoMock.deleteById(1L)).thenReturn(true);
+        when(userRepositoryMock.existsById(1L)).thenReturn(true);
         boolean result = userService.deleteUser(1L);
 
         assertTrue(result);
-        verify(userDaoMock).deleteById(1L);
+        verify(userRepositoryMock).existsById(1L);
+        verify(userRepositoryMock).deleteById(1L);
     }
 }
