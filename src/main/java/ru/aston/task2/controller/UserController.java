@@ -44,9 +44,9 @@ public class UserController {
     @PostMapping
     public ResponseEntity<UserEntity> create(@RequestBody UserCreateRequest request) {
         UserEntity user = new UserEntity();
-        user.setName(request.name());
-        user.setEmail(request.email());
-        user.setAge(request.age());
+        user.setName(request.getName());
+        user.setEmail(request.getEmail());
+        user.setAge(request.getAge());
 
         UserEntity created = userService.createUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
@@ -59,14 +59,14 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
-        if (request.name() != null) {
-            existing.setName(request.name());
+        if (request.getName() != null) {
+            existing.setName(request.getName());
         }
-        if (request.email() != null) {
-            existing.setEmail(request.email());
+        if (request.getEmail() != null) {
+            existing.setEmail(request.getEmail());
         }
-        if (request.age() != null) {
-            existing.setAge(request.age());
+        if (request.getAge() != null) {
+            existing.setAge(request.getAge());
         }
 
         UserEntity updated = userService.updateUser(existing);

@@ -1,8 +1,16 @@
 package ru.aston.task2.dto;
 
-public record UserUpdateRequest(
-        String name,
-        String email,
-        Integer age
-) {
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class UserUpdateRequest {
+    private String name;
+    private String email;
+    private Integer age;
 }
