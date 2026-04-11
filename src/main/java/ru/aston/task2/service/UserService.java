@@ -56,6 +56,4 @@ public interface UserService {
      * @throws IllegalArgumentException если id <= 0
      */
     void deleteUser(Long id);
-
-
 }
