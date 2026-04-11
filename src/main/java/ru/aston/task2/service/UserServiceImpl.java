@@ -6,7 +6,7 @@ import ru.aston.task2.dto.UserResponse;
 import ru.aston.task2.dto.UserUpdateRequest;
 import ru.aston.task2.exception.UserNotFoundException;
 import ru.aston.task2.mapper.UserMapper;
-import ru.aston.task2.model.UserEntity;
+import ru.aston.task2.entity.UserEntity;
 import ru.aston.task2.repository.UserRepository;
 
 import java.util.List;

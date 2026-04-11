@@ -3,7 +3,7 @@ package ru.aston.task2.mapper;
 import ru.aston.task2.dto.UserCreateRequest;
 import ru.aston.task2.dto.UserResponse;
 import ru.aston.task2.dto.UserUpdateRequest;
-import ru.aston.task2.model.UserEntity;
+import ru.aston.task2.entity.UserEntity;
 
 public final class UserMapper {
 

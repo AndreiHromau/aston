@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record UserUpdateRequest(
+
         @NotBlank(message = "Имя не может быть пустым")
         @Size(max = 100, message = "Имя не должно превышать 100 символов")
         String name,
