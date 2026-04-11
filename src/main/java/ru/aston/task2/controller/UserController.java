@@ -11,11 +11,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.aston.task2.dto.UserCreateRequest;
-import ru.aston.task2.dto.UserDto;
 import ru.aston.task2.dto.UserUpdateRequest;
-import ru.aston.task2.mapper.UserMapper;
 import ru.aston.task2.model.UserEntity;
 import ru.aston.task2.service.UserService;
+
 import java.util.List;
 
 @RestController
@@ -29,44 +28,56 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserDto>> getAll() {
-        List<UserDto> result = userService.getAllUsers().stream()
-                .map(UserMapper::toDto)
-                .toList();
-        return ResponseEntity.ok(result);
+    public List<UserEntity> getAll() {
+        return userService.getAllUsers();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDto> getById(@PathVariable Long id) {
-        UserEntity entity = userService.getUserById(id);
-        if (entity == null) {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<UserEntity> getById(@PathVariable Long id) {
+        UserEntity user = userService.getUserById(id);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-        return ResponseEntity.ok(UserMapper.toDto(entity));
+        return ResponseEntity.ok(user);
     }
 
     @PostMapping
-    public ResponseEntity<UserDto> create(@RequestBody UserCreateRequest request) {
-        UserEntity created = userService.createUser(UserMapper.fromCreateRequest(request));
-        return ResponseEntity.status(HttpStatus.CREATED).body(UserMapper.toDto(created));
+    public ResponseEntity<UserEntity> create(@RequestBody UserCreateRequest request) {
+        UserEntity user = new UserEntity();
+        user.setName(request.name());
+        user.setEmail(request.email());
+        user.setAge(request.age());
+
+        UserEntity created = userService.createUser(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDto> update(@PathVariable Long id, @RequestBody UserUpdateRequest request) {
+    public ResponseEntity<UserEntity> update(@PathVariable Long id, @RequestBody UserUpdateRequest request) {
         UserEntity existing = userService.getUserById(id);
         if (existing == null) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-        UserMapper.applyUpdate(existing, request);
+
+        if (request.name() != null) {
+            existing.setName(request.name());
+        }
+        if (request.email() != null) {
+            existing.setEmail(request.email());
+        }
+        if (request.age() != null) {
+            existing.setAge(request.age());
+        }
+
         UserEntity updated = userService.updateUser(existing);
-        return ResponseEntity.ok(UserMapper.toDto(updated));
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         boolean deleted = userService.deleteUser(id);
         if (!deleted) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         return ResponseEntity.noContent().build();
     }
