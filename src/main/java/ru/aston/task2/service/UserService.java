@@ -1,5 +1,6 @@
 package ru.aston.task2.service;
 
+import java.util.List;
 import ru.aston.task2.model.UserEntity;
 
 /**
@@ -45,4 +46,6 @@ public interface UserService {
      * @throws IllegalArgumentException если id <= 0
      */
     boolean deleteUser(Long id);
+
+    List<UserEntity> getAllUsers();
 }

@@ -16,6 +16,7 @@ import ru.aston.task2.dto.UserUpdateRequest;
 import ru.aston.task2.mapper.UserMapper;
 import ru.aston.task2.model.UserEntity;
 import ru.aston.task2.service.UserService;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
@@ -25,6 +26,14 @@ public class UserController {
 
     public UserController(UserService userService) {
         this.userService = userService;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<UserDto>> getAll() {
+        List<UserDto> result = userService.getAllUsers().stream()
+                .map(UserMapper::toDto)
+                .toList();
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/{id}")

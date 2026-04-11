@@ -13,6 +13,7 @@ import ru.aston.task2.model.UserEntity;
 import ru.aston.task2.service.UserService;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -35,6 +36,34 @@ class UserControllerTest {
 
     @MockBean
     private UserService userService;
+
+    @Test
+    void getAll_returnsListOfDtos() throws Exception {
+        UserEntity user1 = new UserEntity();
+        user1.setId(1L);
+        user1.setName("Ivan");
+        user1.setEmail("ivan@mail.ru");
+        user1.setAge(25);
+        user1.setCreatedAt(LocalDateTime.of(2024, 1, 1, 12, 0));
+
+        UserEntity user2 = new UserEntity();
+        user2.setId(2L);
+        user2.setName("Petr");
+        user2.setEmail("petr@mail.ru");
+        user2.setAge(30);
+        user2.setCreatedAt(LocalDateTime.of(2024, 1, 2, 12, 0));
+
+        when(userService.getAllUsers()).thenReturn(List.of(user1, user2));
+
+        mockMvc.perform(get("/api/users"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].name").value("Ivan"))
+                .andExpect(jsonPath("$[0].email").value("ivan@mail.ru"))
+                .andExpect(jsonPath("$[1].id").value(2))
+                .andExpect(jsonPath("$[1].name").value("Petr"))
+                .andExpect(jsonPath("$[1].email").value("petr@mail.ru"));
+    }
 
     @Test
     void getById_whenUserExists_returnsDto() throws Exception {

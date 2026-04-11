@@ -4,6 +4,8 @@ import org.springframework.stereotype.Service;
 import ru.aston.task2.model.UserEntity;
 import ru.aston.task2.repository.UserRepository;
 
+import java.util.List;
+
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -35,5 +37,10 @@ public class UserServiceImpl implements UserService {
         }
         userRepository.deleteById(id);
         return true;
+    }
+
+    @Override
+    public List<UserEntity> getAllUsers() {
+        return userRepository.findAll();
     }
 }
