@@ -33,7 +33,7 @@ public interface UserController {
      * @return пользователь, либо ответ 404 если пользователь не найден
      */
     @GetMapping("/{id}")
-    ResponseEntity<UserResponse> getById(@PathVariable Long id);
+    ResponseEntity<UserResponse> getById(@PathVariable("id") Long id);
 
     /**
      * Создать пользователя.
@@ -52,7 +52,7 @@ public interface UserController {
      * @return обновлённый пользователь, либо ответ 404 если пользователь не найден
      */
     @PutMapping("/{id}")
-    ResponseEntity<UserResponse> update(@PathVariable Long id, @Valid @RequestBody UserUpdateRequest request);
+    ResponseEntity<UserResponse> update(@PathVariable("id") Long id, @Valid @RequestBody UserUpdateRequest request);
 
     /**
      * Удалить пользователя по идентификатору.
@@ -61,5 +61,5 @@ public interface UserController {
      * @return ответ 204 если пользователь удалён, либо ответ 404 если пользователь не найден
      */
     @DeleteMapping("/{id}")
-    ResponseEntity<Void> delete(@PathVariable Long id);
+    ResponseEntity<Void> delete(@PathVariable("id") Long id);
 }
