@@ -1,6 +1,7 @@
 package ru.aston.task2.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -8,8 +9,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.aston.task2.dto.UserCreateRequest;
+import ru.aston.task2.dto.UserResponse;
 import ru.aston.task2.dto.UserUpdateRequest;
-import ru.aston.task2.model.UserEntity;
+import ru.aston.task2.exception.UserNotFoundException;
 import ru.aston.task2.service.UserService;
 
 import java.time.LocalDateTime;
@@ -17,6 +19,8 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -25,7 +29,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(UserController.class)
+@WebMvcTest(UserControllerImpl.class)
 class UserControllerTest {
 
     @Autowired
@@ -38,20 +42,10 @@ class UserControllerTest {
     private UserService userService;
 
     @Test
+    @DisplayName("Получение всех пользователей: возвращается список")
     void getAll_returnsListOfDtos() throws Exception {
-        UserEntity user1 = new UserEntity();
-        user1.setId(1L);
-        user1.setName("Ivan");
-        user1.setEmail("ivan@mail.ru");
-        user1.setAge(25);
-        user1.setCreatedAt(LocalDateTime.of(2024, 1, 1, 12, 0));
-
-        UserEntity user2 = new UserEntity();
-        user2.setId(2L);
-        user2.setName("Petr");
-        user2.setEmail("petr@mail.ru");
-        user2.setAge(30);
-        user2.setCreatedAt(LocalDateTime.of(2024, 1, 2, 12, 0));
+        UserResponse user1 = new UserResponse(1L, "Ivan", "ivan@mail.ru", 25, LocalDateTime.of(2024, 1, 1, 12, 0));
+        UserResponse user2 = new UserResponse(2L, "Petr", "petr@mail.ru", 30, LocalDateTime.of(2024, 1, 2, 12, 0));
 
         when(userService.getAllUsers()).thenReturn(List.of(user1, user2));
 
@@ -66,13 +60,9 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Получение пользователя по id: пользователь найден")
     void getById_whenUserExists_returnsDto() throws Exception {
-        UserEntity user = new UserEntity();
-        user.setId(1L);
-        user.setName("Ivan");
-        user.setEmail("ivan@mail.ru");
-        user.setAge(25);
-        user.setCreatedAt(LocalDateTime.of(2024, 1, 1, 12, 0));
+        UserResponse user = new UserResponse(1L, "Ivan", "ivan@mail.ru", 25, LocalDateTime.of(2024, 1, 1, 12, 0));
 
         when(userService.getUserById(1L)).thenReturn(user);
 
@@ -86,25 +76,22 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Получение пользователя по id: пользователь не найден (404)")
     void getById_whenUserMissing_returns404() throws Exception {
-        when(userService.getUserById(999L)).thenReturn(null);
+        when(userService.getUserById(999L)).thenThrow(new UserNotFoundException(999L));
 
         mockMvc.perform(get("/api/users/{id}", 999L))
                 .andExpect(status().isNotFound());
     }
 
     @Test
+    @DisplayName("Создание пользователя: возвращается 201 и созданный пользователь")
     void create_returns201AndDto() throws Exception {
         UserCreateRequest request = new UserCreateRequest("Ivan", "ivan@mail.ru", 25);
 
-        UserEntity created = new UserEntity();
-        created.setId(10L);
-        created.setName("Ivan");
-        created.setEmail("ivan@mail.ru");
-        created.setAge(25);
-        created.setCreatedAt(LocalDateTime.of(2024, 1, 1, 12, 0));
+        UserResponse created = new UserResponse(10L, "Ivan", "ivan@mail.ru", 25, LocalDateTime.of(2024, 1, 1, 12, 0));
 
-        when(userService.createUser(any(UserEntity.class))).thenReturn(created);
+        when(userService.createUser(any(UserCreateRequest.class))).thenReturn(created);
 
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -117,9 +104,10 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Обновление пользователя: пользователь не найден (404)")
     void update_whenUserMissing_returns404() throws Exception {
-        UserUpdateRequest request = new UserUpdateRequest("NewName", null, null);
-        when(userService.getUserById(1L)).thenReturn(null);
+        UserUpdateRequest request = new UserUpdateRequest("NewName", "new@mail.ru", 30);
+        when(userService.updateUser(eq(1L), any(UserUpdateRequest.class))).thenThrow(new UserNotFoundException(1L));
 
         mockMvc.perform(put("/api/users/{id}", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -128,18 +116,13 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Обновление пользователя: пользователь найден и обновлён")
     void update_whenUserExists_returnsUpdatedDto() throws Exception {
-        UserUpdateRequest request = new UserUpdateRequest("NewName", null, 30);
+        UserUpdateRequest request = new UserUpdateRequest("NewName", "new@mail.ru", 30);
 
-        UserEntity existing = new UserEntity();
-        existing.setId(1L);
-        existing.setName("Ivan");
-        existing.setEmail("ivan@mail.ru");
-        existing.setAge(25);
-        existing.setCreatedAt(LocalDateTime.of(2024, 1, 1, 12, 0));
+        UserResponse updated = new UserResponse(1L, "NewName", "ivan@mail.ru", 30, LocalDateTime.of(2024, 1, 1, 12, 0));
 
-        when(userService.getUserById(1L)).thenReturn(existing);
-        when(userService.updateUser(eq(existing))).thenAnswer(inv -> inv.getArgument(0));
+        when(userService.updateUser(eq(1L), any(UserUpdateRequest.class))).thenReturn(updated);
 
         mockMvc.perform(put("/api/users/{id}", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -152,16 +135,18 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Удаление пользователя: успешно удалён (204)")
     void delete_whenDeleted_returns204() throws Exception {
-        when(userService.deleteUser(1L)).thenReturn(true);
+        doNothing().when(userService).deleteUser(1L);
 
         mockMvc.perform(delete("/api/users/{id}", 1L))
                 .andExpect(status().isNoContent());
     }
 
     @Test
+    @DisplayName("Удаление пользователя: пользователь не найден (404)")
     void delete_whenMissing_returns404() throws Exception {
-        when(userService.deleteUser(1L)).thenReturn(false);
+        doThrow(new UserNotFoundException(1L)).when(userService).deleteUser(1L);
 
         mockMvc.perform(delete("/api/users/{id}", 1L))
                 .andExpect(status().isNotFound());

@@ -1,7 +1,10 @@
 package ru.aston.task2.service;
 
 import java.util.List;
-import ru.aston.task2.model.UserEntity;
+
+import ru.aston.task2.dto.UserCreateRequest;
+import ru.aston.task2.dto.UserResponse;
+import ru.aston.task2.dto.UserUpdateRequest;
 
 /**
  * Интерфейс бизнес-логики для управления пользователями.
@@ -12,12 +15,12 @@ public interface UserService {
     /**
      * Создает нового пользователя с валидацией данных.
      *
-     * @param user данные пользователя для создания
+     * @param request данные пользователя для создания
      * @return созданный пользователь с присвоенным ID
      * @throws IllegalArgumentException если данные невалидны
      * @throws RuntimeException         если пользователь с таким email уже существует
      */
-    UserEntity createUser(UserEntity user);
+    UserResponse createUser(UserCreateRequest request);
 
     /**
      * Находит пользователя по уникальному идентификатору.
@@ -27,25 +30,32 @@ public interface UserService {
      * @throws IllegalArgumentException если id <= 0
      * @throws RuntimeException         если пользователь не найден
      */
-    UserEntity getUserById(Long id);
+    UserResponse getUserById(Long id);
+
+    /**
+     * Возвращает список всех пользователей.
+     *
+     * @return список пользователей
+     */
+    List<UserResponse> getAllUsers();
 
     /**
      * Обновляет данные существующего пользователя.
      *
-     * @param user обновленные данные пользователя
+     * @param id      идентификатор пользователя
+     * @param request новые данные пользователя
      * @return обновленный пользователь
      * @throws IllegalArgumentException если данные невалидны или пользователь не существует
      */
-    UserEntity updateUser(UserEntity user);
+    UserResponse updateUser(Long id, UserUpdateRequest request);
 
     /**
      * Удаляет пользователя по идентификатору.
      *
      * @param id идентификатор пользователя для удаления
-     * @return true если пользователь был удален, иначе false
      * @throws IllegalArgumentException если id <= 0
      */
-    boolean deleteUser(Long id);
+    void deleteUser(Long id);
 
-    List<UserEntity> getAllUsers();
+
 }
