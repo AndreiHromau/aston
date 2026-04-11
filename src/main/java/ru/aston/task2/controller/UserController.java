@@ -15,16 +15,22 @@ import ru.aston.task2.dto.UserUpdateRequest;
 
 import java.util.List;
 
+/**
+ * REST API для управления пользователями.
+ *
+ * <p>Принимает и возвращает только DTO — entity никогда не покидает сервисный слой.</p>
+ */
 @RequestMapping("/api/users")
 public interface UserController {
 
     /**
-     * Получить список всех пользователей.
+     * Создать пользователя.
      *
-     * @return список пользователей
+     * @param request данные для создания пользователя
+     * @return созданный пользователь
      */
-    @GetMapping
-    ResponseEntity<List<UserResponse>> getAll();
+    @PostMapping
+    ResponseEntity<UserResponse> create(@Valid @RequestBody UserCreateRequest request);
 
     /**
      * Получить пользователя по идентификатору.
@@ -36,13 +42,12 @@ public interface UserController {
     ResponseEntity<UserResponse> getById(@PathVariable("id") Long id);
 
     /**
-     * Создать пользователя.
+     * Получить список всех пользователей.
      *
-     * @param request данные для создания пользователя
-     * @return созданный пользователь
+     * @return список пользователей
      */
-    @PostMapping
-    ResponseEntity<UserResponse> create(@Valid @RequestBody UserCreateRequest request);
+    @GetMapping
+    ResponseEntity<List<UserResponse>> getAll();
 
     /**
      * Обновить пользователя.
