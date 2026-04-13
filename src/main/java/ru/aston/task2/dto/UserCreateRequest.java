@@ -7,6 +7,13 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+/**
+ * DTO для создания нового пользователя.
+ *
+ * @param name  имя пользователя (не пустое, максимум 100 символов)
+ * @param email email пользователя (не пустой, валидный формат, максимум 255 символов)
+ * @param age   возраст пользователя (обязателен, 1..150)
+ */
 public record UserCreateRequest(
 
         @NotBlank(message = "Имя не может быть пустым")
