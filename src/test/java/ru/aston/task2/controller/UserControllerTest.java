@@ -49,10 +49,8 @@ class UserControllerTest {
 
         when(userService.getAllUsers()).thenReturn(List.of(user1, user2));
 
-        // when
+        // when / then
         mockMvc.perform(get("/api/users"))
-
-                // then
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[0].name").value("Ivan"))
@@ -70,10 +68,8 @@ class UserControllerTest {
 
         when(userService.getUserById(1L)).thenReturn(user);
 
-        // when
+        // when / then
         mockMvc.perform(get("/api/users/{id}", 1L))
-
-                // then
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("Ivan"))
@@ -88,10 +84,8 @@ class UserControllerTest {
         // given
         when(userService.getUserById(999L)).thenThrow(new UserNotFoundException(999L));
 
-        // when
+        // when / then
         mockMvc.perform(get("/api/users/{id}", 999L))
-
-                // then
                 .andExpect(status().isNotFound());
     }
 
@@ -105,12 +99,10 @@ class UserControllerTest {
 
         when(userService.createUser(any(UserCreateRequest.class))).thenReturn(created);
 
-        // when
+        // when / then
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-
-                // then
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(10))
                 .andExpect(jsonPath("$.name").value("Ivan"))
@@ -125,12 +117,10 @@ class UserControllerTest {
         UserUpdateRequest request = new UserUpdateRequest("NewName", "new@mail.ru", 30);
         when(userService.updateUser(eq(1L), any(UserUpdateRequest.class))).thenThrow(new UserNotFoundException(1L));
 
-        // when
+        // when / then
         mockMvc.perform(put("/api/users/{id}", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-
-                // then
                 .andExpect(status().isNotFound());
     }
 
@@ -144,12 +134,10 @@ class UserControllerTest {
 
         when(userService.updateUser(eq(1L), any(UserUpdateRequest.class))).thenReturn(updated);
 
-        // when
+        // when / then
         mockMvc.perform(put("/api/users/{id}", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-
-                // then
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("NewName"))
@@ -163,10 +151,8 @@ class UserControllerTest {
         // given
         doNothing().when(userService).deleteUser(1L);
 
-        // when
+        // when / then
         mockMvc.perform(delete("/api/users/{id}", 1L))
-
-                // then
                 .andExpect(status().isNoContent());
     }
 
@@ -176,10 +162,8 @@ class UserControllerTest {
         // given
         doThrow(new UserNotFoundException(1L)).when(userService).deleteUser(1L);
 
-        // when
+        // when / then
         mockMvc.perform(delete("/api/users/{id}", 1L))
-
-                // then
                 .andExpect(status().isNotFound());
     }
 
