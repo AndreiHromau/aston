@@ -1,35 +1,61 @@
 package ru.aston.task2.service;
 
-import ru.aston.task2.dao.UserDao;
-import ru.aston.task2.model.UserEntity;
+import org.springframework.stereotype.Service;
+import ru.aston.task2.dto.UserCreateRequest;
+import ru.aston.task2.dto.UserResponse;
+import ru.aston.task2.dto.UserUpdateRequest;
+import ru.aston.task2.exception.UserNotFoundException;
+import ru.aston.task2.mapper.UserMapper;
+import ru.aston.task2.entity.UserEntity;
+import ru.aston.task2.repository.UserRepository;
 
+import java.util.List;
+
+@Service
 public class UserServiceImpl implements UserService {
 
-    private final UserDao userDao;
+    private final UserRepository userRepository;
 
-    public UserServiceImpl(UserDao userDao) {
-        this.userDao = userDao;
+    public UserServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override
-    public UserEntity createUser(UserEntity user) {
-        userDao.save(user);
-        return user;
+    public UserResponse createUser(UserCreateRequest request) {
+        UserEntity created = userRepository.save(UserMapper.fromCreateRequest(request));
+        return UserMapper.toDto(created);
     }
 
     @Override
-    public UserEntity getUserById(Long id) {
-        return userDao.findById(id).orElse(null);
+    public UserResponse getUserById(Long id) {
+        UserEntity entity = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+        return UserMapper.toDto(entity);
     }
 
     @Override
-    public UserEntity updateUser(UserEntity user) {
-        userDao.update(user);
-        return user;
+    public List<UserResponse> getAllUsers() {
+        return userRepository.findAll()
+                .stream()
+                .map(UserMapper::toDto)
+                .toList();
     }
 
     @Override
-    public boolean deleteUser(Long id) {
-        return userDao.deleteById(id);
+    public UserResponse updateUser(Long id, UserUpdateRequest request) {
+        UserEntity entity = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+
+        UserMapper.applyUpdate(entity, request);
+        UserEntity updated = userRepository.save(entity);
+        return UserMapper.toDto(updated);
+    }
+
+    @Override
+    public void deleteUser(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new UserNotFoundException(id);
+        }
+        userRepository.deleteById(id);
     }
 }
