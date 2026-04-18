@@ -1,4 +1,4 @@
-package ru.aston.task2.kafka;
+package ru.aston.task2.kafka.producer;
 
 public record UserEvent(
         String operation,
