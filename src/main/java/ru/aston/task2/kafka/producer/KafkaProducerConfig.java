@@ -9,6 +9,7 @@ import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
+import ru.aston.task2.kafka.dto.UserEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,12 +18,12 @@ import java.util.Map;
 public class KafkaProducerConfig {
 
     @Bean
-    public ProducerFactory<String, ru.aston.task2.kafka.producer.UserEvent> userEventProducerFactory(
+    public ProducerFactory<String, UserEvent> userEventProducerFactory(
             @Value("${spring.kafka.bootstrap-servers}") String bootstrapServers
     ) {
         Map<String, Object> config = new HashMap<>();
         config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        config.put(ProducerConfig.ACKS_CONFIG, "0");
+        config.put(ProducerConfig.ACKS_CONFIG, "1");
         config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
         config.put(JsonSerializer.ADD_TYPE_INFO_HEADERS, false);
@@ -30,8 +31,8 @@ public class KafkaProducerConfig {
     }
 
     @Bean
-    public KafkaTemplate<String, ru.aston.task2.kafka.producer.UserEvent> userEventKafkaTemplate(
-            ProducerFactory<String, ru.aston.task2.kafka.producer.UserEvent> userEventProducerFactory
+    public KafkaTemplate<String, UserEvent> userEventKafkaTemplate(
+            ProducerFactory<String, UserEvent> userEventProducerFactory
     ) {
         return new KafkaTemplate<>(userEventProducerFactory);
     }
