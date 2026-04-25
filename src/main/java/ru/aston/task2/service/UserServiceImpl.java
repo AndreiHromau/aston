@@ -5,6 +5,7 @@ import ru.aston.task2.dto.UserCreateRequest;
 import ru.aston.task2.dto.UserResponse;
 import ru.aston.task2.dto.UserUpdateRequest;
 import ru.aston.task2.exception.UserNotFoundException;
+import ru.aston.task2.kafka.producer.UserEventProducer;
 import ru.aston.task2.mapper.UserMapper;
 import ru.aston.task2.entity.UserEntity;
 import ru.aston.task2.repository.UserRepository;
@@ -15,14 +16,17 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final UserEventProducer userEventProducer;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, UserEventProducer userEventProducer) {
         this.userRepository = userRepository;
+        this.userEventProducer = userEventProducer;
     }
 
     @Override
     public UserResponse createUser(UserCreateRequest request) {
         UserEntity created = userRepository.save(UserMapper.fromCreateRequest(request));
+        userEventProducer.sendUserCreated(created.getEmail());
         return UserMapper.toDto(created);
     }
 
@@ -53,9 +57,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new UserNotFoundException(id);
-        }
-        userRepository.deleteById(id);
+        UserEntity entity = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+
+        userRepository.delete(entity);
+        userEventProducer.sendUserDeleted(entity.getEmail());
     }
 }
