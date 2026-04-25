@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,8 +21,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import ru.aston.task2.dto.UserCreateRequest;
 import ru.aston.task2.dto.UserResponse;
 import ru.aston.task2.dto.UserUpdateRequest;
-
-import java.util.List;
 
 /**
  * REST API для управления пользователями.
@@ -42,7 +42,7 @@ public interface UserController {
             content = @Content(schema = @Schema(implementation = UserResponse.class)))
     @ApiResponse(responseCode = "400", description = "Ошибка валидации", content = @Content)
     @PostMapping
-    ResponseEntity<UserResponse> create(@Valid @RequestBody UserCreateRequest request);
+    ResponseEntity<EntityModel<UserResponse>> create(@Valid @RequestBody UserCreateRequest request);
 
     /**
      * Получить пользователя по идентификатору.
@@ -55,7 +55,7 @@ public interface UserController {
             content = @Content(schema = @Schema(implementation = UserResponse.class)))
     @ApiResponse(responseCode = "404", description = "Пользователь не найден", content = @Content)
     @GetMapping("/{id}")
-    ResponseEntity<UserResponse> getById(
+    ResponseEntity<EntityModel<UserResponse>> getById(
             @Parameter(description = "ID пользователя", example = "1")
             @PathVariable("id") Long id
     );
@@ -69,7 +69,7 @@ public interface UserController {
     @ApiResponse(responseCode = "200", description = "Список пользователей",
             content = @Content(array = @ArraySchema(schema = @Schema(implementation = UserResponse.class))))
     @GetMapping
-    ResponseEntity<List<UserResponse>> getAll();
+    ResponseEntity<CollectionModel<EntityModel<UserResponse>>> getAll();
 
     /**
      * Обновить пользователя.
@@ -84,7 +84,7 @@ public interface UserController {
     @ApiResponse(responseCode = "400", description = "Ошибка валидации", content = @Content)
     @ApiResponse(responseCode = "404", description = "Пользователь не найден", content = @Content)
     @PutMapping("/{id}")
-    ResponseEntity<UserResponse> update(
+    ResponseEntity<EntityModel<UserResponse>> update(
             @Parameter(description = "ID пользователя", example = "1")
             @PathVariable("id") Long id,
             @Valid @RequestBody UserUpdateRequest request
