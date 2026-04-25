@@ -20,10 +20,10 @@ public class UserEventProducer {
     }
 
     public void sendUserCreated(String email) {
-        kafkaTemplate.send(topic, email, new UserEvent("CREATE", email));
+        kafkaTemplate.send(topic, email, new UserEvent(UserEvent.Operation.CREATE, email));
     }
 
     public void sendUserDeleted(String email) {
-        kafkaTemplate.send(topic, email, new UserEvent("DELETE", email));
+        kafkaTemplate.send(topic, email, new UserEvent(UserEvent.Operation.DELETE, email));
     }
 }
