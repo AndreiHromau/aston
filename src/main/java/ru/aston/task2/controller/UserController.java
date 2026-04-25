@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -40,7 +41,11 @@ public interface UserController {
     @Operation(summary = "Создать пользователя")
     @ApiResponse(responseCode = "201", description = "Пользователь создан",
             content = @Content(schema = @Schema(implementation = UserResponse.class)))
-    @ApiResponse(responseCode = "400", description = "Ошибка валидации", content = @Content)
+    @ApiResponse(responseCode = "400", description = "Ошибка валидации: некорректные поля запроса",
+            content = @Content(examples = @ExampleObject(
+                    name = "validationError",
+                    value = "{\"timestamp\":\"2026-04-25T12:00:00\",\"status\":400,\"error\":\"Bad Request\",\"path\":\"/api/users\"}"
+            )))
     @PostMapping
     ResponseEntity<EntityModel<UserResponse>> create(@Valid @RequestBody UserCreateRequest request);
 
@@ -53,7 +58,11 @@ public interface UserController {
     @Operation(summary = "Получить пользователя по id")
     @ApiResponse(responseCode = "200", description = "Пользователь найден",
             content = @Content(schema = @Schema(implementation = UserResponse.class)))
-    @ApiResponse(responseCode = "404", description = "Пользователь не найден", content = @Content)
+    @ApiResponse(responseCode = "404", description = "Пользователь не найден",
+            content = @Content(examples = @ExampleObject(
+                    name = "notFound",
+                    value = "{\"timestamp\":\"2026-04-25T12:00:00\",\"status\":404,\"error\":\"Not Found\",\"message\":\"Пользователь с id=1 не найден\",\"path\":\"/api/users/1\"}"
+            )))
     @GetMapping("/{id}")
     ResponseEntity<EntityModel<UserResponse>> getById(
             @Parameter(description = "ID пользователя", example = "1")
@@ -81,8 +90,16 @@ public interface UserController {
     @Operation(summary = "Обновить пользователя")
     @ApiResponse(responseCode = "200", description = "Пользователь обновлён",
             content = @Content(schema = @Schema(implementation = UserResponse.class)))
-    @ApiResponse(responseCode = "400", description = "Ошибка валидации", content = @Content)
-    @ApiResponse(responseCode = "404", description = "Пользователь не найден", content = @Content)
+    @ApiResponse(responseCode = "400", description = "Ошибка валидации: некорректные поля запроса",
+            content = @Content(examples = @ExampleObject(
+                    name = "validationError",
+                    value = "{\"timestamp\":\"2026-04-25T12:00:00\",\"status\":400,\"error\":\"Bad Request\",\"path\":\"/api/users/1\"}"
+            )))
+    @ApiResponse(responseCode = "404", description = "Пользователь не найден",
+            content = @Content(examples = @ExampleObject(
+                    name = "notFound",
+                    value = "{\"timestamp\":\"2026-04-25T12:00:00\",\"status\":404,\"error\":\"Not Found\",\"message\":\"Пользователь с id=1 не найден\",\"path\":\"/api/users/1\"}"
+            )))
     @PutMapping("/{id}")
     ResponseEntity<EntityModel<UserResponse>> update(
             @Parameter(description = "ID пользователя", example = "1")
@@ -98,7 +115,11 @@ public interface UserController {
      */
     @Operation(summary = "Удалить пользователя")
     @ApiResponse(responseCode = "204", description = "Пользователь удалён", content = @Content)
-    @ApiResponse(responseCode = "404", description = "Пользователь не найден", content = @Content)
+    @ApiResponse(responseCode = "404", description = "Пользователь не найден",
+            content = @Content(examples = @ExampleObject(
+                    name = "notFound",
+                    value = "{\"timestamp\":\"2026-04-25T12:00:00\",\"status\":404,\"error\":\"Not Found\",\"message\":\"Пользователь с id=1 не найден\",\"path\":\"/api/users/1\"}"
+            )))
     @DeleteMapping("/{id}")
     ResponseEntity<Void> delete(
             @Parameter(description = "ID пользователя", example = "1")
