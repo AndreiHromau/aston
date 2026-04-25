@@ -36,7 +36,7 @@ public interface UserController {
      * Создать пользователя.
      *
      * @param request данные для создания пользователя
-     * @return созданный пользователь
+     * @return созданный пользователь, обёрнутый в HATEOAS-модель (ссылки в поле _links)
      */
     @Operation(summary = "Создать пользователя")
     @ApiResponse(responseCode = "201", description = "Пользователь создан",
@@ -53,7 +53,7 @@ public interface UserController {
      * Получить пользователя по идентификатору.
      *
      * @param id идентификатор пользователя
-     * @return пользователь, либо ответ 404 если пользователь не найден
+     * @return пользователь, обёрнутый в HATEOAS-модель (ссылки в поле _links), либо ответ 404 если пользователь не найден
      */
     @Operation(summary = "Получить пользователя по id")
     @ApiResponse(responseCode = "200", description = "Пользователь найден",
@@ -72,7 +72,7 @@ public interface UserController {
     /**
      * Получить список всех пользователей.
      *
-     * @return список пользователей
+     * @return коллекция пользователей в формате HAL (элементы в _embedded, ссылки в _links)
      */
     @Operation(summary = "Получить список всех пользователей")
     @ApiResponse(responseCode = "200", description = "Список пользователей",
@@ -85,7 +85,8 @@ public interface UserController {
      *
      * @param id      идентификатор пользователя
      * @param request данные для обновления пользователя
-     * @return обновлённый пользователь, либо ответ 404 если пользователь не найден
+     * @return обновлённый пользователь, обёрнутый в HATEOAS-модель (ссылки в поле _links),
+     * либо ответ 404 если пользователь не найден
      */
     @Operation(summary = "Обновить пользователя")
     @ApiResponse(responseCode = "200", description = "Пользователь обновлён",
