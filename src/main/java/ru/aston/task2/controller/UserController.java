@@ -1,5 +1,12 @@
 package ru.aston.task2.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,6 +27,7 @@ import java.util.List;
  *
  * <p>Принимает и возвращает только DTO — entity никогда не покидает сервисный слой.</p>
  */
+@Tag(name = "Users", description = "CRUD пользователей")
 @RequestMapping("/api/users")
 public interface UserController {
 
@@ -29,6 +37,10 @@ public interface UserController {
      * @param request данные для создания пользователя
      * @return созданный пользователь
      */
+    @Operation(summary = "Создать пользователя")
+    @ApiResponse(responseCode = "201", description = "Пользователь создан",
+            content = @Content(schema = @Schema(implementation = UserResponse.class)))
+    @ApiResponse(responseCode = "400", description = "Ошибка валидации", content = @Content)
     @PostMapping
     ResponseEntity<UserResponse> create(@Valid @RequestBody UserCreateRequest request);
 
@@ -38,14 +50,24 @@ public interface UserController {
      * @param id идентификатор пользователя
      * @return пользователь, либо ответ 404 если пользователь не найден
      */
+    @Operation(summary = "Получить пользователя по id")
+    @ApiResponse(responseCode = "200", description = "Пользователь найден",
+            content = @Content(schema = @Schema(implementation = UserResponse.class)))
+    @ApiResponse(responseCode = "404", description = "Пользователь не найден", content = @Content)
     @GetMapping("/{id}")
-    ResponseEntity<UserResponse> getById(@PathVariable("id") Long id);
+    ResponseEntity<UserResponse> getById(
+            @Parameter(description = "ID пользователя", example = "1")
+            @PathVariable("id") Long id
+    );
 
     /**
      * Получить список всех пользователей.
      *
      * @return список пользователей
      */
+    @Operation(summary = "Получить список всех пользователей")
+    @ApiResponse(responseCode = "200", description = "Список пользователей",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = UserResponse.class))))
     @GetMapping
     ResponseEntity<List<UserResponse>> getAll();
 
@@ -56,8 +78,17 @@ public interface UserController {
      * @param request данные для обновления пользователя
      * @return обновлённый пользователь, либо ответ 404 если пользователь не найден
      */
+    @Operation(summary = "Обновить пользователя")
+    @ApiResponse(responseCode = "200", description = "Пользователь обновлён",
+            content = @Content(schema = @Schema(implementation = UserResponse.class)))
+    @ApiResponse(responseCode = "400", description = "Ошибка валидации", content = @Content)
+    @ApiResponse(responseCode = "404", description = "Пользователь не найден", content = @Content)
     @PutMapping("/{id}")
-    ResponseEntity<UserResponse> update(@PathVariable("id") Long id, @Valid @RequestBody UserUpdateRequest request);
+    ResponseEntity<UserResponse> update(
+            @Parameter(description = "ID пользователя", example = "1")
+            @PathVariable("id") Long id,
+            @Valid @RequestBody UserUpdateRequest request
+    );
 
     /**
      * Удалить пользователя по идентификатору.
@@ -65,6 +96,12 @@ public interface UserController {
      * @param id идентификатор пользователя
      * @return ответ 204 если пользователь удалён, либо ответ 404 если пользователь не найден
      */
+    @Operation(summary = "Удалить пользователя")
+    @ApiResponse(responseCode = "204", description = "Пользователь удалён", content = @Content)
+    @ApiResponse(responseCode = "404", description = "Пользователь не найден", content = @Content)
     @DeleteMapping("/{id}")
-    ResponseEntity<Void> delete(@PathVariable("id") Long id);
+    ResponseEntity<Void> delete(
+            @Parameter(description = "ID пользователя", example = "1")
+            @PathVariable("id") Long id
+    );
 }
