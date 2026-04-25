@@ -19,11 +19,12 @@ public class KafkaProducerConfig {
 
     @Bean
     public ProducerFactory<String, UserEvent> userEventProducerFactory(
-            @Value("${spring.kafka.bootstrap-servers}") String bootstrapServers
+            @Value("${spring.kafka.bootstrap-servers}") String bootstrapServers,
+            @Value("${app.kafka.producer.acks:1}") String acks
     ) {
         Map<String, Object> config = new HashMap<>();
         config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        config.put(ProducerConfig.ACKS_CONFIG, "1");
+        config.put(ProducerConfig.ACKS_CONFIG, acks);
         config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
         config.put(JsonSerializer.ADD_TYPE_INFO_HEADERS, false);
