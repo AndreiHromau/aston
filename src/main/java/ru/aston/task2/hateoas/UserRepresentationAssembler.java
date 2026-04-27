@@ -15,6 +15,15 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Component
+/**
+ * Сборщик HATEOAS-представлений для {@link UserResponse}.
+ *
+ * Добавляет ссылки для модели одного пользователя:
+ * self (getById), users (getAll), update, delete, create.
+ *
+ * Добавляет ссылки для модели коллекции пользователей:
+ * self (getAll), create.
+ */
 public class UserRepresentationAssembler implements RepresentationModelAssembler<UserResponse, EntityModel<UserResponse>> {
 
     @Override
