@@ -1,4 +1,4 @@
-package ru.aston.task2.config;
+package ru.aston.task2.swagger.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
