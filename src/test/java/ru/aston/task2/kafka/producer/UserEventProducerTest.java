@@ -17,7 +17,7 @@ class UserEventProducerTest {
 
     @Test
     void sendUserCreated_sendsCreateEvent() {
-        // given
+        // GIVEN
         String topic = "user-events";
         String email = "ivan@mail.ru";
 
@@ -26,10 +26,10 @@ class UserEventProducerTest {
         KafkaTemplate<String, UserEvent> kafkaTemplate = new KafkaTemplate<>(producerFactory);
         UserEventProducer producer = new UserEventProducer(kafkaTemplate, topic);
 
-        // when
+        // WHEN
         producer.sendUserCreated(email);
 
-        // then
+        // THEN
         assertFalse(mockProducer.history().isEmpty());
         ProducerRecord<String, UserEvent> record = mockProducer.history().getFirst();
         assertEquals(topic, record.topic());
@@ -40,7 +40,7 @@ class UserEventProducerTest {
 
     @Test
     void sendUserDeleted_sendsDeleteEvent() {
-        // given
+        // GIVEN
         String topic = "user-events";
         String email = "ivan@mail.ru";
 
@@ -49,10 +49,10 @@ class UserEventProducerTest {
         KafkaTemplate<String, UserEvent> kafkaTemplate = new KafkaTemplate<>(producerFactory);
         UserEventProducer producer = new UserEventProducer(kafkaTemplate, topic);
 
-        // when
+        // WHEN
         producer.sendUserDeleted(email);
 
-        // then
+        // THEN
         assertFalse(mockProducer.history().isEmpty());
         ProducerRecord<String, UserEvent> record = mockProducer.history().getFirst();
         assertEquals(topic, record.topic());

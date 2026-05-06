@@ -8,6 +8,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.CollectionModel;
+import ru.aston.task2.hateoas.UserRepresentationAssembler;
 import ru.aston.task2.dto.UserCreateRequest;
 import ru.aston.task2.dto.UserResponse;
 import ru.aston.task2.dto.UserUpdateRequest;
@@ -40,6 +43,9 @@ class UserControllerTest {
     @MockBean
     private UserService userService;
 
+    @MockBean
+    private UserRepresentationAssembler assembler;
+
     @Test
     @DisplayName("Получение всех пользователей: возвращается список")
     void getAll_returnsListOfDtos() throws Exception {
@@ -48,16 +54,23 @@ class UserControllerTest {
         UserResponse user2 = userResponse(2L, "Petr", "petr@mail.ru", 30, LocalDateTime.of(2024, 1, 2, 12, 0));
 
         when(userService.getAllUsers()).thenReturn(List.of(user1, user2));
+        when(assembler.toCollectionModel(any(List.class)))
+                .thenAnswer(invocation -> {
+                    List<UserResponse> dtos = invocation.getArgument(0);
+                    List<EntityModel<UserResponse>> models = dtos.stream().map(EntityModel::of).toList();
+                    return CollectionModel.of(models);
+                });
 
         // when / then
         mockMvc.perform(get("/api/users"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1))
-                .andExpect(jsonPath("$[0].name").value("Ivan"))
-                .andExpect(jsonPath("$[0].email").value("ivan@mail.ru"))
-                .andExpect(jsonPath("$[1].id").value(2))
-                .andExpect(jsonPath("$[1].name").value("Petr"))
-                .andExpect(jsonPath("$[1].email").value("petr@mail.ru"));
+                .andExpect(jsonPath("$._embedded").exists())
+                .andExpect(jsonPath("$._embedded.*[0].id").value(1))
+                .andExpect(jsonPath("$._embedded.*[0].name").value("Ivan"))
+                .andExpect(jsonPath("$._embedded.*[0].email").value("ivan@mail.ru"))
+                .andExpect(jsonPath("$._embedded.*[1].id").value(2))
+                .andExpect(jsonPath("$._embedded.*[1].name").value("Petr"))
+                .andExpect(jsonPath("$._embedded.*[1].email").value("petr@mail.ru"));
     }
 
     @Test
@@ -67,6 +80,8 @@ class UserControllerTest {
         UserResponse user = userResponse(1L, "Ivan", "ivan@mail.ru", 25, LocalDateTime.of(2024, 1, 1, 12, 0));
 
         when(userService.getUserById(1L)).thenReturn(user);
+        when(assembler.toModel(any(UserResponse.class)))
+                .thenAnswer(invocation -> EntityModel.of(invocation.getArgument(0)));
 
         // when / then
         mockMvc.perform(get("/api/users/{id}", 1L))
@@ -98,6 +113,8 @@ class UserControllerTest {
         UserResponse created = userResponse(10L, "Ivan", "ivan@mail.ru", 25, LocalDateTime.of(2024, 1, 1, 12, 0));
 
         when(userService.createUser(any(UserCreateRequest.class))).thenReturn(created);
+        when(assembler.toModel(any(UserResponse.class)))
+                .thenAnswer(invocation -> EntityModel.of(invocation.getArgument(0)));
 
         // when / then
         mockMvc.perform(post("/api/users")
@@ -133,6 +150,8 @@ class UserControllerTest {
         UserResponse updated = userResponse(1L, "NewName", "ivan@mail.ru", 30, LocalDateTime.of(2024, 1, 1, 12, 0));
 
         when(userService.updateUser(eq(1L), any(UserUpdateRequest.class))).thenReturn(updated);
+        when(assembler.toModel(any(UserResponse.class)))
+                .thenAnswer(invocation -> EntityModel.of(invocation.getArgument(0)));
 
         // when / then
         mockMvc.perform(put("/api/users/{id}", 1L)
