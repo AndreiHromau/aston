@@ -1,0 +1,91 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_DB: users_db
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer:latest
+    container_name: adminer
+    depends_on:
+      - postgres
+    ports:
+      - "8083:8080"
+
+  kafka:
+    image: apache/kafka:latest
+    container_name: kafka
+    ports:
+      - "9092:9092"
+
+  eureka-server:
+    build:
+      context: ./aston-eureka-server
+    container_name: eureka-server
+    environment:
+      EUREKA_PORT: "8761"
+      SPRING_APPLICATION_NAME: "aston-eureka-server"
+    ports:
+      - "8761:8761"
+
+  api-gateway:
+    build:
+      context: ./aston-api-gateway
+    container_name: api-gateway
+    depends_on:
+      - eureka-server
+    environment:
+      GATEWAY_PORT: "8082"
+      EUREKA_DEFAULT_ZONE: "http://eureka-server:8761/eureka"
+      USER_SERVICE_ID: "user-service"
+      NOTIFICATION_SERVICE_ID: "notification-service"
+    ports:
+      - "8082:8082"
+
+  user-service:
+    build:
+      context: ./aston-java-intensive
+    container_name: user-service
+    depends_on:
+      - postgres
+      - kafka
+      - eureka-server
+    environment:
+      SPRING_APPLICATION_NAME: "user-service"
+      DB_URL: "jdbc:postgresql://postgres:5432/users_db"
+      DB_USERNAME: "root"
+      DB_PASSWORD: "root"
+      KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
+      USER_EVENTS_TOPIC: "user-events"
+      KAFKA_PRODUCER_ACKS: "1"
+      EUREKA_DEFAULT_ZONE: "http://eureka-server:8761/eureka"
+    ports:
+      - "8080:8080"
+
+  notification-service:
+    build:
+      context: ./aston-notification-service/aston-notification-service
+    container_name: notification-service
+    depends_on:
+      - kafka
+      - eureka-server
+    environment:
+      NOTIFICATION_SERVICE_PORT: "8081"
+      SPRING_APPLICATION_NAME: "notification-service"
+      KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
+      USER_EVENTS_TOPIC: "user-events"
+      KAFKA_CONSUMER_GROUP_ID: "notification-service"
+      KAFKA_CONSUMER_AUTO_OFFSET_RESET: "earliest"
+      EUREKA_DEFAULT_ZONE: "http://eureka-server:8761/eureka"
+    ports:
+      - "8081:8081"
+
+volumes:
+  postgres_data:
